@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
-
+import sys
 
 def frame_filler(df, name: str, size: float):
     data = pd.read_csv(name + ".csv", na_values=[""])
 
-    if name[:5] == "Alice":
+    if name[9:14] == "Alice":
         hum_name = name[:-1] + "Hum.txt"
     else:
         hum_name = name + "Hum.txt"
@@ -47,9 +47,6 @@ def frame_filler(df, name: str, size: float):
     all_data["Humidity"] = all_data.apply(lambda x: (x["Temperature"] - x["T.Min"]) * ((x["RHmaxT"] - x["RHminT"]) / (x["T.Max"] - x["T.Min"]))+ x["RHminT"]
                                                     if x["T.Max"] != x["T.Min"] else x["RHmaxT"], axis = 1)
 
-    
-    
-
     columns = ["Size", "Temperature", "Irradiance", "Humidity", "Yield"]
     columns.extend(hours)
     columns.extend(months)                                            
@@ -82,7 +79,7 @@ if __name__ == "__main__":
     df = pd.DataFrame(columns = columns)
     
     for i in solar_sites_sizes:
-        df = frame_filler(df, i, solar_sites_sizes[i])
+        df = frame_filler(df, "all_data/" + i, solar_sites_sizes[i])
 
 
     size_max = df["Size"].max()
@@ -97,12 +94,13 @@ if __name__ == "__main__":
     hum_min = df["Humidity"].min()
 
 
+
     df["Size"] = df["Size"].apply(lambda x: (x - size_min) / (size_max - size_min))
     df["Yield"] = df["Yield"].apply(lambda x: (x - yield_min) / (yield_max - yield_min))
     df["Temperature"] = df["Temperature"].apply(lambda x: (x - temp_min) / (temp_max - temp_min))
     df["Irradiance"] = df["Irradiance"].apply(lambda x: (x - irr_min) / (irr_max - irr_min))
     df["Humidity"] = df["Humidity"].apply(lambda x: (x - hum_min) / (hum_max - hum_min))
 
-    df = df.sample(frac = 1)
+    df = df.sample(frac = 1, random_state=42)
     df.to_csv("FinalData.csv", index = False, header=False, sep = " ")
 

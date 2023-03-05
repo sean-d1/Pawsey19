@@ -10,6 +10,7 @@ class InitCentersKMeans(Initializer):
     """
 
     def __init__(self, X, max_iter=400):
+        print(X.shape)
         self.X = X
         self.max_iter = max_iter
         super().__init__()
